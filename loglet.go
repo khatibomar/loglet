@@ -11,13 +11,13 @@ type (
 		State  tailStateEnum
 	}
 
-	SendableLogletReadStream[S SequenceNumberer, D Payload] struct {
-		Stream chan LogRecord[S, D]
+	SendableLogletReadStream[S SequenceNumberer] struct {
+		Stream chan LogRecord[S]
 		Done   chan struct{}
 	}
 
-	LogletBase[S SequenceNumberer, D Payload] interface {
-		CreateReadStream(ctx context.Context, from, to SequenceNumberer) (SendableLogletReadStream[S, D], error)
+	LogletBase[S SequenceNumberer] interface {
+		CreateReadStream(ctx context.Context, from, to SequenceNumberer) (SendableLogletReadStream[S], error)
 		Append(ctx context.Context, data []byte) (SequenceNumberer, error)
 		LastKnownUnsealedTail() SequenceNumberer
 		WatchTail() <-chan TailState
@@ -26,26 +26,26 @@ type (
 		GetTrimPoint(ctx context.Context) (SequenceNumberer, error)
 		Trim(ctx context.Context, trimPoint SequenceNumberer) error
 		Seal(ctx context.Context) error
-		Read(ctx context.Context, from SequenceNumberer) (LogRecord[S, D], error)
-		ReadOpt(ctx context.Context, from SequenceNumberer) (LogRecord[S, D], bool, error)
+		Read(ctx context.Context, from SequenceNumberer) (LogRecord[S], error)
+		ReadOpt(ctx context.Context, from SequenceNumberer) (LogRecord[S], bool, error)
 	}
 
-	Loglet[S SequenceNumberer, D Payload] interface {
-		LogletBase[S, D]
+	Loglet[S SequenceNumberer] interface {
+		LogletBase[S]
 	}
 
 	LogletOffset struct {
 		Value uint64
 	}
 
-	LogRecord[S SequenceNumberer, D Payload] struct {
+	LogRecord[S SequenceNumberer] struct {
 		Offset S
-		Record Record[S, D]
+		Record Record[S]
 	}
 
-	Record[S SequenceNumberer, D Payload] struct {
+	Record[S SequenceNumberer] struct {
 		Offset S
-		Data   D
+		Data   Payload
 	}
 
 	Header struct {
